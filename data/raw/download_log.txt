@@ -1,0 +1,29 @@
+Download date: 2026-11-21
+Countries: PL, FR, FI
+
+=== price_to_income (tipsho60) ===
+File: data/raw/price_to_income_tipsho60_raw.csv
+Rows per country: {'FI': 3, 'FR': 3, 'PL': 3}
+Year columns in raw table: 2000-2025 (26 years)
+Metadata columns:
+  - freq: ['A']
+  - unit: ['PTIR_I25', 'PTIR_LT_AVG', 'RCH_A_AVG']
+
+=== youth_unemp (tipslm80) ===
+File: data/raw/youth_unemp_tipslm80_raw.csv
+Rows per country: {'FI': 2, 'FR': 2, 'PL': 2}
+Year columns in raw table: 2003-2025 (23 years)
+Metadata columns:
+  - freq: ['A']
+  - age: ['Y15-24']
+  - sex: ['T']
+  - unit: ['PC_ACT', 'PPCH_3Y']
+
+=== gini (ilc_di12) ===
+File: data/raw/gini_ilc_di12_raw.csv
+Rows per country: {'FI': 2, 'FR': 2, 'PL': 2}
+Year columns in raw table: 2003-2025 (23 years)
+Metadata columns:
+  - freq: ['A']
+  - age: ['TOTAL', 'Y_LT18']
+  - statinfo: ['GINI_HND']
