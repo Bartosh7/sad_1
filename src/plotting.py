@@ -2,6 +2,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import seaborn as sns
+import pandas as pd
 
 COUNTRY_ORDER = ["Polska", "Finlandia", "Francja"]
 
@@ -284,3 +285,59 @@ def plot_yoy_changes(
 
     _save_figure(fig, save_path)
     return fig, axes
+
+def compute_summary_stats(
+    df: pd.DataFrame,
+    change_col: str = "change",
+    country_order: list[str] | None = None,
+    save_path: Path | str | None = None,
+) -> pd.DataFrame:
+    order = country_order if country_order is not None else COUNTRY_ORDER
+    start_yr = int(df["year"].min())
+    end_yr = int(df["year"].max())
+
+    rows = []
+    for country in order:
+        sub = df[df["country"] == country].sort_values("year")
+        if sub.empty:
+            continue
+        s = sub["value"]
+
+        mean_val = s.mean()
+        std_val = s.std(ddof=1)
+        q1 = s.quantile(0.25)
+        q3 = s.quantile(0.75)
+        yoy_std = s.diff().dropna().std(ddof=1)
+
+        min_row = sub.loc[s.idxmin()]
+        max_row = sub.loc[s.idxmax()]
+        val_start = sub.loc[sub["year"] == start_yr, "value"].iloc[0]
+        val_end = sub.loc[sub["year"] == end_yr, "value"].iloc[0]
+
+        rows.append({
+            "country": country,
+            "n": len(s),
+            "mean": round(mean_val, 2),
+            "median": round(s.median(), 2),
+            "q1": round(q1, 2),
+            "q3": round(q3, 2),
+            "iqr": round(q3 - q1, 2),
+            "std": round(std_val, 2),
+            "cv_pct": round((std_val / mean_val) * 100, 2),
+            "yoy_std": round(yoy_std, 2),
+            "min": f"{min_row['value']:.2f} ({int(min_row['year'])})",
+            "max": f"{max_row['value']:.2f} ({int(max_row['year'])})",
+            f"val_{start_yr}": round(val_start, 2),
+            f"val_{end_yr}": round(val_end, 2),
+            change_col: round(val_end - val_start, 2),
+        })
+
+    stats_df = pd.DataFrame(rows)
+
+    if save_path is not None:
+        path = Path(save_path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        stats_df.to_csv(path, index=False)
+        print(f"Saved stats table to {path}")
+
+    return stats_df
